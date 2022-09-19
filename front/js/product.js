@@ -1,10 +1,12 @@
 let id = null;
 
+// Récupération de l'item via l'API avec son ID
 async function getProduct(id) {
   const response = await fetch("http://localhost:3000/api/products/" + id);
   return response.json();
 }
 
+// Affichage de l'item
 async function displayItem(id) {
   const product = await getProduct(id);
   const itemImg = document.getElementsByClassName("item__img");
@@ -12,14 +14,13 @@ async function displayItem(id) {
   const itemTitle = document.getElementById("title");
   const itemPrice = document.getElementById("price");
   const itemDescription = document.getElementById("description");
-
   const img = document.createElement("img");
+
   img.setAttribute("src", product.imageUrl);
   img.setAttribute("alt", product.altTxt);
   itemTitle.innerHTML = product.name;
   itemPrice.innerHTML = product.price;
   itemDescription.innerHTML = product.description;
-
   itemImg[0].appendChild(img);
 
   product.colors.map((color) => {
@@ -47,6 +48,17 @@ addToCart.addEventListener("click", () => {
     console.log("error, color or quantity invalid");
     return;
   }
-  // mettre a jour l'element en ajoutant la quantite + redirection
-  localStorage.setItem(id + color.value, [id, quantity.value, color.value]);
+  const item = localStorage.getItem(id + color.value)?.split(",");
+  console.log(item);
+  if (!item) {
+    localStorage.setItem(id + color.value, [id, quantity.value, color.value]);
+  } else {
+    localStorage.setItem(id + color.value, [
+      id,
+      Number(quantity.value) + Number(item[1]),
+      color.value,
+    ]);
+  }
+  document.location.href =
+    "http://127.0.0.1:5500/P5-Dev-Web-Kanap/front/html/cart.html";
 });

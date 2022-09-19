@@ -1,11 +1,13 @@
 let priceTotal = 0;
 let articles = 0;
 
+// Récupération de l'item via l'API avec son ID
 async function getProduct(id) {
   const response = await fetch("http://localhost:3000/api/products/" + id);
   return response.json();
 }
 
+// Affichage des items du panier
 async function displayItem(item) {
   const product = await getProduct(item[0]);
   const cartItem = document.getElementById("cart__items");
@@ -101,15 +103,36 @@ async function displayItem(item) {
   });
 }
 
+// Affichage des items du panier
 function localStorageLoop() {
   for (let item of Object.getOwnPropertyNames(localStorage)) {
     displayItem(localStorage[item].split(","));
   }
 }
 
-localStorageLoop();
+// Envoi de la requete avec les information à l'API
+async function postRequest(contact) {
+  let products = [];
+  for (let itemId of Object.getOwnPropertyNames(localStorage)) {
+    products.push(localStorage.getItem(itemId).split(",")[0]);
+  }
 
-async function formCheck() {
+  const response = await fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+    },
+    body: JSON.stringify({ contact, products }),
+  });
+  const result = await response.json();
+  document.location.href =
+    "http://127.0.0.1:5500/P5-Dev-Web-Kanap/front/html/confirmation.html?orderId=" +
+    result.orderId;
+}
+
+// Vérification du formulaire
+function formCheck() {
+  let check = true;
   const inputFirstName = document.getElementById("firstName");
   const inputLastName = document.getElementById("lastName");
   const inputAddress = document.getElementById("address");
@@ -136,46 +159,43 @@ async function formCheck() {
   emailErrorMsg.innerHTML = "";
   if (!regexName.test(inputFirstName.value)) {
     firstNameErrorMsg.innerHTML = "Votre prénom est invalide";
+    check = false;
   }
   if (!regexName.test(inputLastName.value)) {
     lastNameErrorMsg.innerHTML = "Votre nom est invalide";
+    check = false;
   }
   if (!regexAddress.test(inputAddress.value)) {
     addressErrorMsg.innerHTML = "Votre adresse est invalide";
+    check = false;
   }
   if (!regexCity.test(inputCity.value)) {
     cityErrorMsg.innerHTML = "Votre ville est invalide";
+    check = false;
   }
   if (!regexEmail.test(inputEmail.value)) {
     emailErrorMsg.innerHTML = "Votre adresse mail est invalide";
+    check = false;
   }
 
-  const contact = {
-    firstName: inputFirstName.value,
-    lastName: inputLastName.value,
-    address: inputAddress.value,
-    city: inputCity.value,
-    email: inputEmail.value,
-  };
-
-  let products = [];
-  for (let itemId of Object.getOwnPropertyNames(localStorage)) {
-    products.push(itemId);
-  }
-  const test = JSON.stringify(JSON.stringify({ contact, products }));
-  const response = await fetch("http://localhost:3000/api/products/order", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ contact, products }),
-  });
-  const result = await response.json();
-  console.log(result);
+  return check
+    ? {
+        firstName: inputFirstName.value,
+        lastName: inputLastName.value,
+        address: inputAddress.value,
+        city: inputCity.value,
+        email: inputEmail.value,
+      }
+    : false;
 }
+
+localStorageLoop();
 
 const submit = document.getElementById("order");
 submit.addEventListener("click", (e) => {
-  formCheck();
+  const resCheck = formCheck();
+  if (resCheck) {
+    postRequest(resCheck);
+  }
   e.preventDefault();
 });
