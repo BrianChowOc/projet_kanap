@@ -44,8 +44,15 @@ const addToCart = document.getElementById("addToCart");
 addToCart.addEventListener("click", () => {
   const quantity = document.getElementById("quantity");
   const color = document.getElementById("colors");
+  color.setAttribute("style", "");
+  quantity.setAttribute("style", "");
   if (!color.value || quantity.value === "0") {
-    console.log("error, color or quantity invalid");
+    if (!color.value) {
+      color.setAttribute("style", "border-color: red; border-width: 2px");
+    }
+    if (quantity.value === "0") {
+      quantity.setAttribute("style", "border-color: red; border-width: 2px");
+    }
     return;
   }
   const item = localStorage.getItem(id + color.value)?.split(",");
@@ -59,6 +66,5 @@ addToCart.addEventListener("click", () => {
       color.value,
     ]);
   }
-  document.location.href =
-    "http://127.0.0.1:5500/P5-Dev-Web-Kanap/front/html/cart.html";
+  document.location.href = "http://127.0.0.1:5500/front/html/cart.html";
 });

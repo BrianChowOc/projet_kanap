@@ -94,6 +94,9 @@ async function displayItem(item) {
     totalQty.innerHTML = articles;
     localStorage.removeItem(item[0] + item[2]);
     pDelete.closest("article").remove();
+    if (localStorage.length === 0) {
+      cartItem.innerHTML = "Il n'y a pas d'article dans votre panier";
+    }
   });
 
   inputQty.addEventListener("change", () => {
@@ -126,7 +129,7 @@ async function postRequest(contact) {
   });
   const result = await response.json();
   document.location.href =
-    "http://127.0.0.1:5500/P5-Dev-Web-Kanap/front/html/confirmation.html?orderId=" +
+    "http://127.0.0.1:5500/front/html/confirmation.html?orderId=" +
     result.orderId;
 }
 
@@ -190,11 +193,15 @@ function formCheck() {
 }
 
 localStorageLoop();
-
+if (localStorage.length === 0) {
+  const cartItem = document.getElementById("cart__items");
+  cartItem.innerHTML = "Il n'y a pas d'article dans votre panier";
+}
 const submit = document.getElementById("order");
 submit.addEventListener("click", (e) => {
   const resCheck = formCheck();
-  if (resCheck) {
+
+  if (resCheck && localStorage.length > 0) {
     postRequest(resCheck);
   }
   e.preventDefault();
