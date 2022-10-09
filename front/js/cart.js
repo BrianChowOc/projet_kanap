@@ -86,7 +86,6 @@ async function displayItem(item) {
 
   totalPrice.innerHTML = priceTotal;
   totalQty.innerHTML = articles;
-
   pDelete.addEventListener("click", () => {
     articles -= Number(item[1]);
     priceTotal -= item[1] * product.price;
@@ -100,37 +99,16 @@ async function displayItem(item) {
   });
 
   inputQty.addEventListener("change", () => {
-    console.log(localStorage);
     localStorage.setItem(item[0] + item[2], [item[0], inputQty.value, item[2]]);
     document.location.reload(true);
   });
 }
 
 // Affichage des items du panier
-function localStorageLoop() {
+async function localStorageLoop() {
   for (let item of Object.getOwnPropertyNames(localStorage)) {
-    displayItem(localStorage[item].split(","));
+    await displayItem(localStorage[item].split(","));
   }
-}
-
-// Envoi de la requete avec les information à l'API
-async function postRequest(contact) {
-  let products = [];
-  for (let itemId of Object.getOwnPropertyNames(localStorage)) {
-    products.push(localStorage.getItem(itemId).split(",")[0]);
-  }
-
-  const response = await fetch("http://localhost:3000/api/products/order", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json;charset=utf-8",
-    },
-    body: JSON.stringify({ contact, products }),
-  });
-  const result = await response.json();
-  document.location.href =
-    "http://127.0.0.1:5500/front/html/confirmation.html?orderId=" +
-    result.orderId;
 }
 
 // Vérification du formulaire
@@ -192,11 +170,34 @@ function formCheck() {
     : false;
 }
 
+// Envoi de la requete avec les information à l'API
+async function postRequest(contact) {
+  let products = [];
+  for (let itemId of Object.getOwnPropertyNames(localStorage)) {
+    products.push(localStorage.getItem(itemId).split(",")[0]);
+  }
+
+  const response = await fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+    },
+    body: JSON.stringify({ contact, products }),
+  });
+  const result = await response.json();
+  document.location.href =
+    "http://127.0.0.1:5500/front/html/confirmation.html?orderId=" +
+    result.orderId;
+}
+
+console.log(localStorage);
 localStorageLoop();
+
 if (localStorage.length === 0) {
   const cartItem = document.getElementById("cart__items");
   cartItem.innerHTML = "Il n'y a pas d'article dans votre panier";
 }
+
 const submit = document.getElementById("order");
 submit.addEventListener("click", (e) => {
   const resCheck = formCheck();

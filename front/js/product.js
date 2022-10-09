@@ -31,6 +31,21 @@ async function displayItem(id) {
   });
 }
 
+// Vérification de la couleur et de la quantité
+function checkInputs(color, quantity) {
+  let res = true;
+  if (!color.value) {
+    color.setAttribute("style", "border-color: red; border-width: 2px");
+    res = false;
+  }
+  if (quantity.value === "0") {
+    quantity.setAttribute("style", "border-color: red; border-width: 2px");
+    res = false;
+  }
+  return res;
+}
+1;
+
 const adr = window.location.href;
 const url = new URL(adr);
 const search_params = new URLSearchParams(url.search);
@@ -40,23 +55,14 @@ if (search_params.has("id")) {
 }
 
 const addToCart = document.getElementById("addToCart");
-
+// Event pour l'ajout au panier
 addToCart.addEventListener("click", () => {
   const quantity = document.getElementById("quantity");
   const color = document.getElementById("colors");
   color.setAttribute("style", "");
   quantity.setAttribute("style", "");
-  if (!color.value || quantity.value === "0") {
-    if (!color.value) {
-      color.setAttribute("style", "border-color: red; border-width: 2px");
-    }
-    if (quantity.value === "0") {
-      quantity.setAttribute("style", "border-color: red; border-width: 2px");
-    }
-    return;
-  }
+  if (!checkInputs(color, quantity)) return;
   const item = localStorage.getItem(id + color.value)?.split(",");
-  console.log(item);
   if (!item) {
     localStorage.setItem(id + color.value, [id, quantity.value, color.value]);
   } else {

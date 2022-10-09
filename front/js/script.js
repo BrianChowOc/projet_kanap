@@ -27,9 +27,7 @@ async function displayItems() {
     newArticle.appendChild(newImage);
     newArticle.appendChild(newH3);
     newArticle.appendChild(newP);
-
     newLink.appendChild(newArticle);
-
     itemsBlock.appendChild(newLink);
   });
 }
