@@ -1,5 +1,6 @@
 let priceTotal = 0;
 let articles = 0;
+let idLocalStorage = [];
 
 // Récupération de l'item via l'API avec son ID
 async function getProduct(id) {
@@ -107,7 +108,11 @@ async function displayItem(item) {
 // Affichage des items du panier
 async function localStorageLoop() {
   for (let item of Object.getOwnPropertyNames(localStorage)) {
-    await displayItem(localStorage[item].split(","));
+    idLocalStorage.push(item);
+  }
+  idLocalStorage.sort();
+  for (i in idLocalStorage) {
+    await displayItem(localStorage.getItem(idLocalStorage[i]).split(","));
   }
 }
 
@@ -190,7 +195,6 @@ async function postRequest(contact) {
     result.orderId;
 }
 
-console.log(localStorage);
 localStorageLoop();
 
 if (localStorage.length === 0) {
