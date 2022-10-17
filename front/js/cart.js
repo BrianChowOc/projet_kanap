@@ -100,6 +100,10 @@ async function displayItem(item) {
   });
 
   inputQty.addEventListener("change", () => {
+    if (Number(inputQty.value) <= 0) {
+      inputQty.setAttribute("style", "border-color: red; border-width: 2px");
+      return;
+    }
     localStorage.setItem(item[0] + item[2], [item[0], inputQty.value, item[2]]);
     document.location.reload(true);
   });
@@ -190,9 +194,7 @@ async function postRequest(contact) {
     body: JSON.stringify({ contact, products }),
   });
   const result = await response.json();
-  document.location.href =
-    "http://127.0.0.1:5500/front/html/confirmation.html?orderId=" +
-    result.orderId;
+  document.location.href = "./confirmation.html?orderId=" + result.orderId;
 }
 
 localStorageLoop();
